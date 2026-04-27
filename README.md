@@ -42,7 +42,7 @@
 | 03 | Dijkstra (다익스트라 최단 경로) | Search | [`Search/Dijkstra`](Assets/Algorithms/Search/Dijkstra) | [Dijkstra 노트](https://www.notion.so/34f5e18a5736815898f9ccc8f3e977cb) | `Assets/Scenes/Dijkstra.unity` |
 | 04 | A\* (A-Star Pathfinding) | Search | [`Search/AStar`](Assets/Algorithms/Search/AStar) | [A\* 노트](https://www.notion.so/34f5e18a573681b08b79cb481fd52238) | `Assets/Scenes/AStar.unity` |
 
-## 알고리즘 가족 관계
+## 알고리즘 비교
 
 네 알고리즘이 *우선순위 큐의 priority 기준* 만 다른 동일 골격이라는 점이 코드로 확인된다:
 
