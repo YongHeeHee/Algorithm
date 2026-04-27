@@ -25,7 +25,7 @@
 
 알고리즘 개요, 다이어그램, 비교표, 학습 순서 같은 시각 자료는 Notion 학습 허브에 정리되어 있다.
 
-> **Notion 학습 허브**: [Algorithm Study — Notion](https://www.notion.so/algorithm-study-NOTION_URL_HERE)
+> **Notion 학습 허브**: [[Algorithm Study — Notion](https://www.notion.so/algorithm-study-NOTION_URL_HERE)](https://www.notion.so/34f5e18a5736819e9a6bc804cbe12a42)
 >
 > *위 링크는 placeholder. Notion 페이지 작성 후 실제 공개 URL로 교체 필요.*
 
