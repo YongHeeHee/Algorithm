@@ -16,11 +16,11 @@
 ## 실행 방법
 
 1. Unity Hub에서 이 프로젝트 폴더 열기
-2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`)
+2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`, `Flood_Fill.unity`)
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS : 위에서 내려다보는 각도 — 그리드가 평면
+   - BFS / DFS / Flood Fill : 위에서 내려다보는 각도 — 그리드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -41,19 +41,22 @@
 | 02 | DFS (Depth-First Search) | Search | [`Search/DFS`](Assets/Algorithms/Search/DFS) | [DFS 노트](https://www.notion.so/34f5e18a573681a0b707c342c39148da) | `Assets/Scenes/DFS.unity` |
 | 03 | Dijkstra (다익스트라 최단 경로) | Search | [`Search/Dijkstra`](Assets/Algorithms/Search/Dijkstra) | [Dijkstra 노트](https://www.notion.so/34f5e18a5736815898f9ccc8f3e977cb) | `Assets/Scenes/Dijkstra.unity` |
 | 04 | A\* (A-Star Pathfinding) | Search | [`Search/AStar`](Assets/Algorithms/Search/AStar) | [A\* 노트](https://www.notion.so/34f5e18a573681b08b79cb481fd52238) | `Assets/Scenes/AStar.unity` |
+| 05 | Flood Fill (영역 채우기) | Search | [`Search/FloodFill`](Assets/Algorithms/Search/FloodFill) | [Flood Fill 노트](https://www.notion.so/3505e18a57368126b302f8e575a3fddf) | `Assets/Scenes/Flood_Fill.unity` |
 
 ## 알고리즘 비교
 
-네 알고리즘이 *우선순위 큐의 priority 기준* 만 다른 동일 골격이라는 점이 코드로 확인된다:
+핵심 네 알고리즘이 *우선순위 큐의 priority 기준* 만 다른 동일 골격이라는 점이 코드로 확인된다.
+Flood Fill 은 동일 골격의 *그리드 응용판* — 그래프와 visited 집합이 사라지고 그 자리를 격자 자체가 채운다:
 
-| 알고리즘 | 자료구조 | Priority | 가중치 사용 | 휴리스틱 사용 |
-|---------|----------|---------|:--------:|:----------:|
-| **BFS** | `Queue<T>` (FIFO) | 입력 순서 (먼저 들어온 것 먼저) | ❌ | ❌ |
-| **DFS** | `Stack<T>` (LIFO) | 입력 순서 (나중에 들어온 것 먼저) | ❌ | ❌ |
-| **Dijkstra** | `MinPriorityQueue<T>` | `g(n)` — 누적 비용 | ✅ | ❌ |
-| **A\*** | `MinPriorityQueue<T>` | `g(n) + h(n)` — 누적 + 예상 | ✅ | ✅ |
+| 알고리즘 | 자료구조 | Priority / 진행 기준 | 입력 | 가중치 | 휴리스틱 |
+|---------|----------|---------|------|:--:|:--:|
+| **BFS** | `Queue<T>` (FIFO) | 입력 순서 (먼저 들어온 것 먼저) | `Graph<T>` | ❌ | ❌ |
+| **DFS** | `Stack<T>` (LIFO) | 입력 순서 (나중에 들어온 것 먼저) | `Graph<T>` | ❌ | ❌ |
+| **Dijkstra** | `MinPriorityQueue<T>` | `g(n)` — 누적 비용 | `WeightedGraph<T>` | ✅ | ❌ |
+| **A\*** | `MinPriorityQueue<T>` | `g(n) + h(n)` — 누적 + 예상 | `WeightedGraph<T>` | ✅ | ✅ |
+| **Flood Fill** | `Queue<T>` (FIFO) | 입력 순서 + *값 매칭* | `T[,]` (격자) | ❌ | ❌ |
 
-각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 미로에서 네 알고리즘의 탐색 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표).
+각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움).
 
 ## 프로젝트 구조
 
@@ -79,15 +82,20 @@ Assets/
 │       │   ├── DijkstraAlgorithm.cs
 │       │   ├── DijkstraGridVisualizer.cs
 │       │   └── README.md
-│       └── AStar/
-│           ├── AStarAlgorithm.cs
-│           ├── AStarGridVisualizer.cs
+│       ├── AStar/
+│       │   ├── AStarAlgorithm.cs
+│       │   ├── AStarGridVisualizer.cs
+│       │   └── README.md
+│       └── FloodFill/                       # 그래프 의존 없음 — 격자 자체가 자료구조
+│           ├── FloodFillAlgorithm.cs
+│           ├── FloodFillGridVisualizer.cs
 │           └── README.md
 └── Scenes/
     ├── BFS.unity
     ├── DFS.unity
     ├── Dijkstra.unity
-    └── AStar.unity
+    ├── AStar.unity
+    └── Flood_Fill.unity
 ```
 
 ## 콘텐츠 분리 원칙

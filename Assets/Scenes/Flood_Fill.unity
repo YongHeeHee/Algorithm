@@ -256,6 +256,70 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &167793550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 167793551}
+  - component: {fileID: 167793552}
+  m_Layer: 0
+  m_Name: FloodFill
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &167793551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167793550}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &167793552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167793550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 297a3c588c2240440a9a0ed218c11bce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Algorithms.Search.FloodFillGridVisualizer
+  width: 16
+  height: 16
+  cellPrefab: {fileID: 0}
+  cellSize: 1
+  startCoord: {x: 8, y: 8}
+  regionCount: 4
+  randomSeed: 12345
+  stepDelay: 0.04
+  colorFrontier: {r: 1, g: 0.9, b: 0.2, a: 1}
+  colorFilled: {r: 1, g: 0.4, b: 0.8, a: 1}
+  colorStart: {r: 0.2, g: 0.85, b: 0.3, a: 1}
+  regionPalette:
+  - {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  - {r: 0.55, g: 0.75, b: 0.95, a: 1}
+  - {r: 0.95, g: 0.8, b: 0.55, a: 1}
+  - {r: 0.75, g: 0.95, b: 0.65, a: 1}
+  - {r: 0.85, g: 0.65, b: 0.95, a: 1}
+  - {r: 0.95, g: 0.65, b: 0.65, a: 1}
+  - {r: 0.65, g: 0.95, b: 0.95, a: 1}
+  - {r: 0.95, g: 0.95, b: 0.55, a: 1}
 --- !u!1 &285705907
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,7 +756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Algorithms.Common.AlgorithmDemoUI
   restartButton: {fileID: 285705908}
-  demoComponent: {fileID: 0}
+  demoComponent: {fileID: 167793552}
 --- !u!4 &1533857359
 Transform:
   m_ObjectHideFlags: 0
@@ -819,3 +883,4 @@ SceneRoots:
   - {fileID: 788929067}
   - {fileID: 1968370729}
   - {fileID: 1533857359}
+  - {fileID: 167793551}
