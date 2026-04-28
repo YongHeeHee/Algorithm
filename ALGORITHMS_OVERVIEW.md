@@ -36,11 +36,10 @@
 
 NPC 행동, 적 AI, 보드게임 봇.
 
-> **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토)
+> **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토), MCTS (틱택토)
 
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
-| **MCTS (Monte Carlo Tree Search)** | 시뮬레이션으로 유망한 수 선택 — Minimax 대안 | 바둑(AlphaGo), 보드게임 봇 |
 | **Behavior Tree** | 행동을 트리로 — Selector/Sequence/조건 노드 | Halo, 대부분 모던 AAA NPC |
 | **FSM (Finite State Machine)** | 상태 + 전이 규칙 — Idle/Patrol/Chase | 클래식 NPC, 레트로 게임 |
 | **GOAP (Goal-Oriented Action Planning)** | 목표 → 필요 액션 계획 (A\* 변형) | F.E.A.R., S.T.A.L.K.E.R. |
@@ -127,12 +126,12 @@ NPC 행동, 적 AI, 보드게임 봇.
 
 1. ~~**Flood Fill**~~ — *완료* (`Assets/Algorithms/Search/FloodFill`)
 2. ~~**Minimax + Alpha-Beta**~~ — *완료* (`Assets/Algorithms/AI/TicTacToe`)
-3. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
-4. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
-5. **Behavior Tree** *또는* **FSM** — AI 입문 (둘 중 하나로 시작).
-6. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
-7. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
-8. **MCTS** — Minimax 의 대안. 분기가 폭발하는 게임에 적용 (바둑 AlphaGo 의 핵심).
+3. ~~**MCTS**~~ — *완료* (`Assets/Algorithms/AI/MCTS`). 같은 틱택토 위에서 Minimax 와 직접 비교 가능.
+4. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
+5. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
+6. **Behavior Tree** *또는* **FSM** — AI 입문 (둘 중 하나로 시작).
+7. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
+8. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
 
 가장 *게임답고 시각적인 데모* 가 나오는 건 **Perlin Noise** + **Cellular Automata** 조합. Unity 그리드 위에 즉시 인상적인 결과가 나와서 다음 학습으로 동기 부여가 잘 된다.
 

@@ -16,11 +16,11 @@
 ## 실행 방법
 
 1. Unity Hub에서 이 프로젝트 폴더 열기
-2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`, `Flood_Fill.unity`, `Minimax.unity`)
+2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`, `Flood_Fill.unity`, `Minimax.unity`, `MCTS.unity`)
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS / Flood Fill / Minimax : 위에서 내려다보는 각도 — 그리드/보드가 평면
+   - BFS / DFS / Flood Fill / Minimax / MCTS : 위에서 내려다보는 각도 — 그리드/보드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -43,6 +43,7 @@
 | 04 | A\* (A-Star Pathfinding) | Search | [`Search/AStar`](Assets/Algorithms/Search/AStar) | [A\* 노트](https://www.notion.so/34f5e18a573681b08b79cb481fd52238) | `Assets/Scenes/AStar.unity` |
 | 05 | Flood Fill (영역 채우기) | Search | [`Search/FloodFill`](Assets/Algorithms/Search/FloodFill) | [Flood Fill 노트](https://www.notion.so/3505e18a57368126b302f8e575a3fddf) | `Assets/Scenes/Flood_Fill.unity` |
 | 06 | Minimax + Alpha-Beta (게임 트리 탐색) | AI | [`AI/TicTacToe`](Assets/Algorithms/AI/TicTacToe) | [Minimax 노트](https://www.notion.so/3505e18a5736816b935eec489638c4cd) | `Assets/Scenes/Minimax.unity` |
+| 07 | MCTS (Monte Carlo Tree Search) | AI | [`AI/MCTS`](Assets/Algorithms/AI/MCTS) | [MCTS 노트](https://www.notion.so/3505e18a5736816cb85afb7f0b523ed9) | `Assets/Scenes/MCTS.unity` |
 
 ## 알고리즘 비교
 
@@ -57,8 +58,11 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 | **A\*** | `MinPriorityQueue<T>` | `g(n) + h(n)` — 누적 + 예상 | `WeightedGraph<T>` | ✅ | ✅ |
 | **Flood Fill** | `Queue<T>` (FIFO) | 입력 순서 + *값 매칭* | `T[,]` (격자) | ❌ | ❌ |
 | **Minimax** (AI) | 호출 스택 (재귀 DFS) | MAX/MIN 교대 (점수) | 게임 트리 (즉석 생성) | ❌ | ❌ † |
+| **MCTS** (AI) | 트리 노드 + UCB1 | 통계적 샘플링 (visits/winRate) | 게임 트리 (선택적 확장) | ❌ | ❌ ‡ |
 
 † 평가 함수는 비-잎(non-terminal) 노드에서 탐색을 중단할 때 쓰는 휴리스틱이지만, 틱택토는 완전 탐색이 가능하므로 사용하지 않는다. 대신 **Alpha-Beta 가지치기** 로 노드 수를 O(b^d) → 최선 O(b^(d/2)) 로 줄인다.
+
+‡ 평가 함수가 아예 *불필요* 한 것이 MCTS 의 가장 큰 차별점. 게임이 끝날 때까지 *random rollout* 을 돌려 진짜 승/패만 본다 — 도메인 지식이 없는 게임(바둑, Hex)에서 Minimax 의 대안으로 쓰인다. 시간이 많을수록 부드럽게 좋아지는 *anytime* 알고리즘.
 
 각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다.
 
@@ -71,10 +75,14 @@ Assets/
 │   │   ├── IAlgorithmDemo.cs                #   Restart() 한 메서드 contract
 │   │   └── AlgorithmDemoUI.cs               #   UI Button ↔ Visualizer 연결
 │   ├── AI/                                  # AI / 의사결정 카테고리
-│   │   └── TicTacToe/                       #   Minimax + Alpha-Beta 데모 게임
-│   │       ├── TicTacToeBoard.cs            #     게임 국면 (Make/Undo 패턴)
-│   │       ├── MinimaxAlgorithm.cs          #     순수 Minimax + Alpha-Beta 로직
-│   │       ├── TicTacToeVisualizer.cs       #     Unity 시각화 (마우스 클릭 입력)
+│   │   ├── TicTacToe/                       #   Minimax + Alpha-Beta 데모 게임
+│   │   │   ├── TicTacToeBoard.cs            #     게임 국면 (Make/Undo + Clone 패턴) — MCTS 와 공유
+│   │   │   ├── MinimaxAlgorithm.cs          #     순수 Minimax + Alpha-Beta 로직
+│   │   │   ├── TicTacToeVisualizer.cs       #     Unity 시각화 (마우스 클릭 입력)
+│   │   │   └── README.md
+│   │   └── MCTS/                            #   Monte Carlo Tree Search (Minimax 의 통계적 대안)
+│   │       ├── MCTSAlgorithm.cs             #     Searcher 클래스 + 4 단계 (Selection/Expansion/Simulation/Backprop)
+│   │       ├── MCTSVisualizer.cs            #     Unity 시각화 (chunk 단위 점진적 visit 비율 표시)
 │   │       └── README.md
 │   └── Search/                              # 탐색 카테고리
 │       ├── Graph.cs                         #   비가중 인접 리스트 (BFS / DFS)
@@ -106,7 +114,8 @@ Assets/
     ├── Dijkstra.unity
     ├── AStar.unity
     ├── Flood_Fill.unity
-    └── Minimax.unity
+    ├── Minimax.unity
+    └── MCTS.unity
 ```
 
 ## 콘텐츠 분리 원칙

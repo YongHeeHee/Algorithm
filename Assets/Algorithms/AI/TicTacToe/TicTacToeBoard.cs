@@ -220,6 +220,31 @@ namespace Algorithms.AI
             MoveCount = 0;
         }
 
+        /// <summary>
+        /// 현재 보드 상태의 *독립된 복사본* 을 반환한다.
+        ///
+        /// MCTS 의 시뮬레이션 단계는 무작위 수를 끝까지 두면서 결과만 본다.
+        /// Make/Undo 로 되돌리는 게 가능하긴 하지만 코드가 복잡해지고, 시뮬레이션 깊이가 매번 달라
+        /// 깔끔하지 않다. 이럴 땐 *iteration 시작 시 한 번 clone* 하고 그 사본을 마구 변경하는 편이 단순.
+        ///
+        /// (체스/바둑처럼 보드가 무거운 게임에서는 clone 비용이 커 Make/Undo 가 우세하지만,
+        ///  3×3 틱택토에선 차이가 무시 가능 → 가독성 우선.)
+        /// </summary>
+        public TicTacToeBoard Clone()
+        {
+            var copy = new TicTacToeBoard();
+            for (int r = 0; r < Size; r++)
+            {
+                for (int c = 0; c < Size; c++)
+                {
+                    copy._cells[r, c] = _cells[r, c];
+                }
+            }
+            copy.Current   = Current;
+            copy.MoveCount = MoveCount;
+            return copy;
+        }
+
         // 내부 헬퍼: Player 표식을 GameResult 의 승리값으로 변환.
         // X / O 외의 값이 들어오는 경우는 호출 측에서 차단되므로 별도 검증 없이 매핑만 한다.
         private static GameResult ToWinResult(Player p) =>
