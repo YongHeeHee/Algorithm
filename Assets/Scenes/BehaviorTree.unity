@@ -119,6 +119,78 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &85117380
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 85117381}
+  - component: {fileID: 85117382}
+  m_Layer: 0
+  m_Name: BehaviorTree
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &85117381
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85117380}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &85117382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85117380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc82584867ca74e4bae034f86202b81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Algorithms.AI.BehaviorTreeVisualizer
+  width: 12
+  height: 12
+  cellPrefab: {fileID: 0}
+  cellSize: 1
+  npcStart: {x: 1, y: 1}
+  playerStart: {x: 10, y: 10}
+  patrolPoints:
+  - {x: 1, y: 1}
+  - {x: 10, y: 1}
+  - {x: 10, y: 10}
+  - {x: 1, y: 10}
+  wallRatio: 0.15
+  randomSeed: 12345
+  tickInterval: 0.3
+  sightRange: 5
+  attackRange: 1
+  hpLowThreshold: 30
+  hpMax: 100
+  hpDamagePerAttack: 12
+  hpRegenPerTick: 3
+  colorEmpty: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  colorWall: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  colorPatrol: {r: 0.55, g: 0.85, b: 0.85, a: 1}
+  colorPlayer: {r: 0.3, g: 0.55, b: 1, a: 1}
+  colorNpcIdle: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+  colorNpcChase: {r: 1, g: 0.9, b: 0.2, a: 1}
+  colorNpcAttack: {r: 1, g: 0.3, b: 0.3, a: 1}
+  colorNpcFlee: {r: 0.3, g: 0.85, b: 0.85, a: 1}
 --- !u!1 &128879695
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,7 +278,7 @@ Transform:
   m_GameObject: {fileID: 128879695}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 1, y: 8, z: 1}
+  m_LocalPosition: {x: 6, y: 15, z: 6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -377,64 +449,6 @@ RectTransform:
   m_AnchoredPosition: {x: -30, y: 30}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 1, y: 0}
---- !u!1 &549125305
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 549125307}
-  - component: {fileID: 549125306}
-  m_Layer: 0
-  m_Name: MCTS
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &549125306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 549125305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 236a29247473452469c9553ad1598b8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Algorithms.AI.MCTSVisualizer
-  cellPrefab: {fileID: 0}
-  cellSize: 1.1
-  aiPlaysFirst: 0
-  aiVsAi: 1
-  iterations: 1000
-  randomSeed: 0
-  visualizationSteps: 20
-  chunkDelay: 0.06
-  postMoveDelay: 0.25
-  colorEmpty: {r: 0.85, g: 0.85, b: 0.85, a: 1}
-  colorX: {r: 0.3, g: 0.55, b: 1, a: 1}
-  colorO: {r: 1, g: 0.3, b: 0.3, a: 1}
-  colorThinking: {r: 1, g: 0.9, b: 0.2, a: 1}
-  colorWinningLine: {r: 0.2, g: 0.9, b: 0.3, a: 1}
---- !u!4 &549125307
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 549125305}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &747216761
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,7 +764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Algorithms.Common.AlgorithmDemoUI
   restartButton: {fileID: 285705908}
-  demoComponent: {fileID: 549125306}
+  demoComponent: {fileID: 85117382}
 --- !u!4 &1533857359
 Transform:
   m_ObjectHideFlags: 0
@@ -877,4 +891,4 @@ SceneRoots:
   - {fileID: 788929067}
   - {fileID: 1968370729}
   - {fileID: 1533857359}
-  - {fileID: 549125307}
+  - {fileID: 85117381}

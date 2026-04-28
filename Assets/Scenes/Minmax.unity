@@ -615,7 +615,7 @@ MonoBehaviour:
   cellPrefab: {fileID: 0}
   cellSize: 1.1
   aiPlaysFirst: 0
-  aiVsAi: 0
+  aiVsAi: 1
   useAlphaBeta: 1
   thinkStepDelay: 0.18
   postMoveDelay: 0.25
