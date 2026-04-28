@@ -8,14 +8,13 @@
 
 ## 🔎 탐색 / 경로 (Search / Pathfinding)
 
-> **이 프로젝트에서 학습 완료** : BFS, DFS, Dijkstra, A\*
+> **이 프로젝트에서 학습 완료** : BFS, DFS, Dijkstra, A\*, Flood Fill
 
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
 | **JPS+ (Jump Point Search)** | A\* 의 그리드 전용 가속 — 큰 빈 공간을 점프해 탐색 노드 수 대폭 감소 | RTS 의 대규모 유닛 길찾기 |
 | **Theta\*** | A\* 가 만든 격자 경로를 *직선화* — any-angle pathfinding | 자연스러운 NPC 이동 |
 | **D\* Lite** | 동적 환경 (장애물이 움직임) 에서 효율적 재계산 | StarCraft, 미로 변경 퍼즐 |
-| **Flood Fill** | 시작점에서 같은 속성을 가진 모든 칸 채우기 (BFS/DFS 변형) | 페인트 도구, 애니팡류 매칭 |
 
 ---
 
@@ -37,9 +36,10 @@
 
 NPC 행동, 적 AI, 보드게임 봇.
 
+> **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토)
+
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
-| **Minimax + Alpha-Beta** | 게임 트리 완전 탐색 + 가지치기 (DFS 기반) | 체스, 체커, 오목 봇 |
 | **MCTS (Monte Carlo Tree Search)** | 시뮬레이션으로 유망한 수 선택 — Minimax 대안 | 바둑(AlphaGo), 보드게임 봇 |
 | **Behavior Tree** | 행동을 트리로 — Selector/Sequence/조건 노드 | Halo, 대부분 모던 AAA NPC |
 | **FSM (Finite State Machine)** | 상태 + 전이 규칙 — Idle/Patrol/Chase | 클래식 NPC, 레트로 게임 |
@@ -125,13 +125,14 @@ NPC 행동, 적 AI, 보드게임 봇.
 
 이 프로젝트의 다음 학습 흐름과 게임 활용도를 고려한 권장 순서:
 
-1. **Flood Fill** — BFS / DFS 변형. 기존 코드 거의 그대로 재활용 (Notion TODO 에 이미 등록됨).
-2. **Minimax + Alpha-Beta** — DFS 의 게임 트리 응용. 시각화는 트리 형태로 (Notion TODO 에 등록됨).
+1. ~~**Flood Fill**~~ — *완료* (`Assets/Algorithms/Search/FloodFill`)
+2. ~~**Minimax + Alpha-Beta**~~ — *완료* (`Assets/Algorithms/AI/TicTacToe`)
 3. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
 4. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
 5. **Behavior Tree** *또는* **FSM** — AI 입문 (둘 중 하나로 시작).
 6. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
 7. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
+8. **MCTS** — Minimax 의 대안. 분기가 폭발하는 게임에 적용 (바둑 AlphaGo 의 핵심).
 
 가장 *게임답고 시각적인 데모* 가 나오는 건 **Perlin Noise** + **Cellular Automata** 조합. Unity 그리드 위에 즉시 인상적인 결과가 나와서 다음 학습으로 동기 부여가 잘 된다.
 

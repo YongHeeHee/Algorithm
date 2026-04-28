@@ -16,11 +16,11 @@
 ## 실행 방법
 
 1. Unity Hub에서 이 프로젝트 폴더 열기
-2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`, `Flood_Fill.unity`)
+2. `Assets/Scenes/` 의 알고리즘별 씬을 연다 (예: `BFS.unity`, `DFS.unity`, `Dijkstra.unity`, `AStar.unity`, `Flood_Fill.unity`, `Minimax.unity`)
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS / Flood Fill : 위에서 내려다보는 각도 — 그리드가 평면
+   - BFS / DFS / Flood Fill / Minimax : 위에서 내려다보는 각도 — 그리드/보드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -42,11 +42,12 @@
 | 03 | Dijkstra (다익스트라 최단 경로) | Search | [`Search/Dijkstra`](Assets/Algorithms/Search/Dijkstra) | [Dijkstra 노트](https://www.notion.so/34f5e18a5736815898f9ccc8f3e977cb) | `Assets/Scenes/Dijkstra.unity` |
 | 04 | A\* (A-Star Pathfinding) | Search | [`Search/AStar`](Assets/Algorithms/Search/AStar) | [A\* 노트](https://www.notion.so/34f5e18a573681b08b79cb481fd52238) | `Assets/Scenes/AStar.unity` |
 | 05 | Flood Fill (영역 채우기) | Search | [`Search/FloodFill`](Assets/Algorithms/Search/FloodFill) | [Flood Fill 노트](https://www.notion.so/3505e18a57368126b302f8e575a3fddf) | `Assets/Scenes/Flood_Fill.unity` |
+| 06 | Minimax + Alpha-Beta (게임 트리 탐색) | AI | [`AI/TicTacToe`](Assets/Algorithms/AI/TicTacToe) | [Minimax 노트](https://www.notion.so/3505e18a5736816b935eec489638c4cd) | `Assets/Scenes/Minimax.unity` |
 
 ## 알고리즘 비교
 
-핵심 네 알고리즘이 *우선순위 큐의 priority 기준* 만 다른 동일 골격이라는 점이 코드로 확인된다.
-Flood Fill 은 동일 골격의 *그리드 응용판* — 그래프와 visited 집합이 사라지고 그 자리를 격자 자체가 채운다:
+다섯 탐색 알고리즘 (BFS, DFS, Dijkstra, A\*, Flood Fill) 은 모두 *그래프/격자 위 탐색* 카테고리.
+Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 응용* — 노드가 격자 셀 대신 게임 국면이 되고, 반환값이 경로 대신 점수로 바뀐다:
 
 | 알고리즘 | 자료구조 | Priority / 진행 기준 | 입력 | 가중치 | 휴리스틱 |
 |---------|----------|---------|------|:--:|:--:|
@@ -55,8 +56,11 @@ Flood Fill 은 동일 골격의 *그리드 응용판* — 그래프와 visited �
 | **Dijkstra** | `MinPriorityQueue<T>` | `g(n)` — 누적 비용 | `WeightedGraph<T>` | ✅ | ❌ |
 | **A\*** | `MinPriorityQueue<T>` | `g(n) + h(n)` — 누적 + 예상 | `WeightedGraph<T>` | ✅ | ✅ |
 | **Flood Fill** | `Queue<T>` (FIFO) | 입력 순서 + *값 매칭* | `T[,]` (격자) | ❌ | ❌ |
+| **Minimax** (AI) | 호출 스택 (재귀 DFS) | MAX/MIN 교대 (점수) | 게임 트리 (즉석 생성) | ❌ | ❌ † |
 
-각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움).
+† 평가 함수는 비-잎(non-terminal) 노드에서 탐색을 중단할 때 쓰는 휴리스틱이지만, 틱택토는 완전 탐색이 가능하므로 사용하지 않는다. 대신 **Alpha-Beta 가지치기** 로 노드 수를 O(b^d) → 최선 O(b^(d/2)) 로 줄인다.
+
+각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다.
 
 ## 프로젝트 구조
 
@@ -66,7 +70,13 @@ Assets/
 │   ├── Common/                              # 공유 UI / 인터페이스
 │   │   ├── IAlgorithmDemo.cs                #   Restart() 한 메서드 contract
 │   │   └── AlgorithmDemoUI.cs               #   UI Button ↔ Visualizer 연결
-│   └── Search/                              # 알고리즘 카테고리
+│   ├── AI/                                  # AI / 의사결정 카테고리
+│   │   └── TicTacToe/                       #   Minimax + Alpha-Beta 데모 게임
+│   │       ├── TicTacToeBoard.cs            #     게임 국면 (Make/Undo 패턴)
+│   │       ├── MinimaxAlgorithm.cs          #     순수 Minimax + Alpha-Beta 로직
+│   │       ├── TicTacToeVisualizer.cs       #     Unity 시각화 (마우스 클릭 입력)
+│   │       └── README.md
+│   └── Search/                              # 탐색 카테고리
 │       ├── Graph.cs                         #   비가중 인접 리스트 (BFS / DFS)
 │       ├── WeightedGraph.cs                 #   가중치 인접 리스트 (Dijkstra / A*)
 │       ├── MinPriorityQueue.cs              #   이진 힙 우선순위 큐 (Dijkstra / A*)
@@ -95,7 +105,8 @@ Assets/
     ├── DFS.unity
     ├── Dijkstra.unity
     ├── AStar.unity
-    └── Flood_Fill.unity
+    ├── Flood_Fill.unity
+    └── Minimax.unity
 ```
 
 ## 콘텐츠 분리 원칙
