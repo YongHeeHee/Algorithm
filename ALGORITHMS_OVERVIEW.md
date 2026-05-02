@@ -36,14 +36,14 @@
 
 NPC 행동, 적 AI, 보드게임 봇.
 
-> **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토), MCTS (틱택토), Behavior Tree (격자 NPC + A\* 협업), GOAP (격자 NPC + A\* 협업), Utility AI (격자 NPC + 욕구 바 + A\* 협업)
+> **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토), MCTS (틱택토), Behavior Tree (격자 NPC + A\* 협업), GOAP (격자 NPC + A\* 협업), Utility AI (격자 NPC + 욕구 바 + A\* 협업), FSM (격자 NPC + Player + 상태 다이어그램 + A\* 협업)
 
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
 | **Behavior Tree** ✅ | 트리 구조의 의사결정 (Sequence/Selector 단락 평가) | 모던 AAA NPC 의 사실상 표준 |
 | **GOAP** ✅ | 목표 → 필요 액션 계획 (A\* 변형 — state space 위) | F.E.A.R., S.T.A.L.K.E.R. |
 | **Utility AI** ✅ | 점수 함수로 행동 선택 — 직관적 튜닝 | The Sims, RimWorld |
-| **FSM (Finite State Machine)** | 상태 + 전이 규칙 — Idle/Patrol/Chase | 클래식 NPC, 레트로 게임 |
+| **FSM (Finite State Machine)** ✅ | 상태 + 전이 규칙 — Idle/Patrol/Chase | 클래식 NPC, 레트로 게임, Animator |
 
 ---
 
@@ -130,9 +130,9 @@ NPC 행동, 적 AI, 보드게임 봇.
 4. ~~**Behavior Tree**~~ — *완료* (`Assets/Algorithms/AI/BehaviorTree`). BT × A\* 협업 시각화.
 5. ~~**GOAP**~~ — *완료* (`Assets/Algorithms/AI/GOAP`). 상태 공간 A\* + Move 행동 안에서 격자 A\* 협업.
 6. ~~**Utility AI**~~ — *완료* (`Assets/Algorithms/AI/UtilityAI`). 점수 함수 + 매 tick 결정 + 환경 변화 즉각 반응.
-7. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
-8. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
-9. **FSM** — BT/UAI 의 대안 / 보완. NPC 의사결정 4 종 비교 마무리.
+7. ~~**FSM**~~ — *완료* (`Assets/Algorithms/AI/FSM`). NPC 의사결정 4 종 (BT / GOAP / UAI / FSM) 비교 마무리. 명시적 상태 다이어그램 시각화.
+8. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
+9. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
 10. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
 11. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
 
