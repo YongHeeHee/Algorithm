@@ -20,7 +20,7 @@
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP : 위에서 내려다보는 각도 — 그리드/보드가 평면
+   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP / Utility AI : 위에서 내려다보는 각도 — 그리드/보드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -46,6 +46,7 @@
 | 07 | MCTS (Monte Carlo Tree Search) | AI | [`AI/MCTS`](Assets/Algorithms/AI/MCTS) | [MCTS 노트](https://www.notion.so/3505e18a5736816cb85afb7f0b523ed9) | `Assets/Scenes/MCTS.unity` |
 | 08 | Behavior Tree (NPC 의사결정) | AI | [`AI/BehaviorTree`](Assets/Algorithms/AI/BehaviorTree) | [BT 노트](https://www.notion.so/3505e18a573681d9b5d6edac313c44c8) | `Assets/Scenes/BehaviorTree.unity` |
 | 09 | GOAP (목표 기반 자동 계획) | AI | [`AI/GOAP`](Assets/Algorithms/AI/GOAP) | [GOAP 노트](https://www.notion.so/3515e18a57368129a014df84f372de2e) | `Assets/Scenes/GOAP.unity` |
+| 10 | Utility AI (점수 함수 의사결정) | AI | [`AI/UtilityAI`](Assets/Algorithms/AI/UtilityAI) | [Utility AI 노트](https://www.notion.so/3545e18a573681679f4bc7f67cdec3a1) | `Assets/Scenes/UtilityAI.unity` |
 
 ## 알고리즘 비교
 
@@ -63,6 +64,7 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 | **MCTS** (AI) | 트리 노드 + UCB1 | 통계적 샘플링 (visits/winRate) | 게임 트리 (선택적 확장) | ❌ | ❌ ‡ |
 | **Behavior Tree** (AI) | 정적 트리 + 매 tick 평가 | Sequence/Selector 단락 평가 | 디자이너가 그린 트리 | ❌ | ❌ § |
 | **GOAP** (AI) | `MinPriorityQueue<WorldState>` + `HashSet<WorldState>` | `f(s) = g(s) + h(s)` — A\* over **state space** | 행동 카탈로그 (Pre/Eff/Cost) | ✅ (행동 비용) | ✅ (미충족 사실 수) ¶ |
+| **Utility AI** (AI) | 행동 카탈로그 (`UtilityAction[]`) | 매 tick *점수 비교* (Considerations 곱 × Weight) | 행동 + Consideration + Response Curve | ❌ (Weight 로 행동 우선순위) | ❌ (Response Curve 가 점수 곡선) ※ |
 
 † 평가 함수는 비-잎(non-terminal) 노드에서 탐색을 중단할 때 쓰는 휴리스틱이지만, 틱택토는 완전 탐색이 가능하므로 사용하지 않는다. 대신 **Alpha-Beta 가지치기** 로 노드 수를 O(b^d) → 최선 O(b^(d/2)) 로 줄인다.
 
@@ -72,7 +74,9 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 
 ¶ **GOAP 는 사실상 A\* 의 한 응용** — 노드 타입이 *격자 좌표 → 세상 상태* 로 바뀌었을 뿐 자료구조와 골격이 완전히 같다. 그래서 GOAP 데모도 BT 데모처럼 `Move` 행동 *내부* 에서 격자 A\* 를 그대로 호출한다. BT × A\* 는 "디자이너가 그린 트리 위에서 결정", GOAP × A\* 는 "행동 카탈로그 위에서 자동 계획" — 같은 격자·같은 NPC 인데 *결정 메커니즘만* 바뀐다.
 
-각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다.
+※ **Utility AI 는 *탐색* 이 아니다** — 사슬을 *계획* 하지 않고 *매 tick* 모든 행동의 점수를 그 자리에서 비교한다. GOAP 처럼 멀리 보지는 못하지만, 환경 변화에 *즉시 반응* 하는 게 강점 (적이 가까워지면 식사 중에도 도망). 행동 *내부* 의 이동은 BT/GOAP 와 같은 협업 패턴으로 격자 A\* 호출.
+
+각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다. NPC 의사결정 3 종 (BT / GOAP / Utility AI) 은 격자 + Capsule NPC + A\* 협업이라는 같은 골격을 공유하므로, 세 씬을 번갈아 켜보면 *결정 메커니즘만* 어떻게 달라지는지 한눈에 들어온다.
 
 ## 프로젝트 구조
 
@@ -96,9 +100,13 @@ Assets/
 │   │   │   ├── BehaviorTreeAlgorithm.cs     #     Sequence/Selector/Inverter/Condition/Action 노드
 │   │   │   ├── BehaviorTreeVisualizer.cs    #     Capsule NPC + Player + 우측 OnGUI 트리 패널 + A* 협업
 │   │   │   └── README.md
-│   │   └── GOAP/                            #   목표 기반 자동 계획 — F.E.A.R. 류 자율 NPC AI
-│   │       ├── GOAPAlgorithm.cs             #     WorldState + GOAPAction + GOAPPlanner (state space A*)
-│   │       ├── GOAPGridVisualizer.cs        #     5거점 격자 + Capsule NPC + 우측 OnGUI 패널 + A* 협업
+│   │   ├── GOAP/                            #   목표 기반 자동 계획 — F.E.A.R. 류 자율 NPC AI
+│   │   │   ├── GOAPAlgorithm.cs             #     WorldState + GOAPAction + GOAPPlanner (state space A*)
+│   │   │   ├── GOAPGridVisualizer.cs        #     5거점 격자 + Capsule NPC + 우측 OnGUI 패널 + A* 협업
+│   │   │   └── README.md
+│   │   └── UtilityAI/                       #   점수 함수 의사결정 — The Sims / RimWorld 류 욕구 NPC
+│   │       ├── UtilityAIAlgorithm.cs        #     Consideration + ResponseCurve + UtilityAction + UtilityAIBrain
+│   │       ├── UtilityAIGridVisualizer.cs   #     4거점 격자 + Capsule NPC + 적 + 욕구 바·점수 막대 + A* 협업
 │   │       └── README.md
 │   └── Search/                              # 탐색 카테고리
 │       ├── Graph.cs                         #   비가중 인접 리스트 (BFS / DFS)
@@ -133,7 +141,8 @@ Assets/
     ├── Minimax.unity
     ├── MCTS.unity
     ├── BehaviorTree.unity
-    └── GOAP.unity
+    ├── GOAP.unity
+    └── UtilityAI.unity
 ```
 
 ## 콘텐츠 분리 원칙
