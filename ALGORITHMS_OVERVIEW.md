@@ -37,6 +37,8 @@
 NPC 행동, 적 AI, 보드게임 봇.
 
 > **이 프로젝트에서 학습 완료** : Minimax + Alpha-Beta (틱택토), MCTS (틱택토), Behavior Tree (격자 NPC + A\* 협업), GOAP (격자 NPC + A\* 협업), Utility AI (격자 NPC + 욕구 바 + A\* 협업), FSM (격자 NPC + Player + 상태 다이어그램 + A\* 협업)
+>
+> **🗺️ AI 카테고리는 여기서 일단 휴식.** 대중적인 의사결정 6 종을 모두 다뤘으므로, 다른 카테고리 (Procedural Generation, Spatial Partitioning 등) 를 학습한 뒤 돌아온다. 그때 *다음에 무엇을 할지* 의 지도가 Notion 에 정리되어 있다 → [**AI 의사결정 — 추가로 알면 좋은 알고리즘 (TODO)**](https://www.notion.so/3545e18a573681eca7d5e84f7a35f372). Steering Behaviors / HTN / Influence Maps / Q-Learning / HFSM 의 학습 가치, 시각화 아이디어, 우선순위가 적혀 있다.
 
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
