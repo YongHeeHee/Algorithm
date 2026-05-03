@@ -211,7 +211,8 @@ namespace Algorithms.AI
             // ※ 신규 Input System: Vector2 좌표를 ReadValue() 로 받는다 (구 API 의 Input.mousePosition 대체).
             Vector2 screenPos = mouse.position.ReadValue();
             var ray = _camera.ScreenPointToRay(screenPos);
-            if (Physics.Raycast(ray, out var hit))
+            // UnityEngine. 명시 — Algorithms.Physics 네임스페이스(AABB) 와 충돌 방지.
+            if (UnityEngine.Physics.Raycast(ray, out var hit))
             {
                 foreach (var kv in _cellObjects)
                 {

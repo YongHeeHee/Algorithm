@@ -49,18 +49,51 @@ NPC 행동, 적 AI, 보드게임 봇.
 
 ---
 
-## 💥 물리 / 공간 분할 (Physics / Spatial Partitioning)
+## 🌳 공간 분할 (Spatial Partitioning)
 
-충돌 검사, 근처 객체 찾기.
+> **이 프로젝트에서 학습 완료** : Quadtree, Spatial Hashing
+
+*"객체를 어디에 보관할까"* — 객체 위치를 인덱싱해 공간 쿼리 (이 영역 안의 객체 찾기 / 근처 K 개 찾기) 를 가속하는 자료구조 카테고리. 두 자료구조 모두 broad-phase (충돌 후보 추리기) 의 핵심.
 
 | 알고리즘 | 설명 | 게임 예시 |
 |---------|------|-----------|
-| **Quadtree / Octree** | 공간을 4 / 8 분할 재귀 — 충돌/렌더 가속 | 2D/3D 충돌 광역 검사 |
-| **Spatial Hashing** | 그리드 셀에 객체 매핑 — 균등 분포에 빠름 | 슈팅 게임의 탄막 |
-| **BVH (Bounding Volume Hierarchy)** | 바운딩 박스 트리 — 레이트레이싱 표준 | Unity Physics, 모던 GPU 레이트레이싱 |
-| **SAT (Separating Axis Theorem)** | 볼록 다각형 충돌 판정 | 2D 박스/폴리곤 충돌 |
-| **GJK** | 임의 볼록 도형 충돌 (3D) | Unity/Bullet 물리 엔진 내부 |
-| **Verlet Integration** | 위치 기반 물리 — 안정적 시뮬레이션 | 천 시뮬레이션, 로프, 헤어 |
+| **Quadtree / Octree** ✅ | 공간을 4 / 8 분할 재귀 — *적응적* 분할 | 2D/3D 충돌 광역 검사, 분포 편향에 강함 |
+| **Spatial Hashing** ✅ | 균등 격자 셀에 객체 매핑 — *동적 객체* 에 압도적 | 슈팅 게임의 탄막, MMO AoI, Boids |
+| **BVH (Bounding Volume Hierarchy)** | 바운딩 박스 *트리* — 공간이 아닌 *객체* 를 트리 구조로 묶음 | Unity Physics 내부, 모던 GPU 레이트레이싱, 동적 객체에 강함 |
+| **k-d tree** | 데이터 균등 분할 (median 점에서 가름) — Quadtree 의 편향 분포 대안 | Nearest Neighbor 검색, NavMesh 근접 쿼리, ML 의 KNN |
+| **Sweep and Prune (SAP)** | 한 축으로 정렬 후 겹치는 구간만 검사 | Box2D 의 broad-phase, 객체 *대부분 정적* 인 환경 |
+
+### 학습 추천 다음 알고리즘
+
+1. **BVH** — Quadtree 와의 직접 비교 (공간 분할 vs 객체 분할). 동적 객체 + frustum culling 시각화로 인상적.
+2. (선택) **k-d tree** — 점이 한쪽에 몰린 *편향 분포* 데이터에서 Quadtree 와 비교하면 적응성 차이가 시각적으로 드러남.
+
+> Spatial Hashing 까지 마쳤으면 이 카테고리의 *균등 vs 적응* 두 축은 다뤘다. BVH 가 다음 자연스러운 단계 — *공간이 아닌 객체* 를 트리화하는 세 번째 축.
+
+---
+
+## 💥 물리 / 충돌 (Physics / Collision)
+
+> **이 프로젝트에서 학습 완료** : AABB (Contains / Overlaps / Slab Raycast)
+
+*"두 도형이 겹치는가, 어떻게 움직이는가"* — 공간 분할이 broad-phase 였다면 이쪽은 narrow-phase (정밀 판정) + 시뮬레이션 (위치/속도/힘 갱신). 수학·역학 사고 모델.
+
+| 알고리즘 | 설명 | 게임 예시 |
+|---------|------|-----------|
+| **AABB Overlap + Raycast (Slab)** ✅ | 축에 정렬된 박스의 겹침/광선 충돌 — 모든 충돌 시스템의 *원자 단위* | broad-phase 1차 필터, FPS 라인 오브 사이트, 픽셀 충돌 |
+| **SAT (Separating Axis Theorem)** | 볼록 다각형 충돌 정밀 판정 — *분리 축이 존재하면 안 겹친다* | 2D 박스/폴리곤 충돌의 사실상 표준, OBB-OBB |
+| **GJK + EPA** | 임의 볼록 도형 충돌 (3D) — Minkowski 차이 위에서 원점 포함 검사 | Unity/Bullet 물리 엔진 narrow-phase 내부 |
+| **CCD (Continuous Collision Detection)** | 빠른 객체가 벽을 *통과* 하는 tunneling 방지 | 빠른 총알, 작은 객체. Unity Rigidbody "Continuous" 옵션 |
+| **Verlet Integration** | 위치 기반 물리 — Euler 적분 대안, 제약 조건과 잘 어울림 | 천 시뮬레이션, 로프, 헤어, 소프트바디 |
+| **Impulse-Based Collision Response** | 충돌 후 *어떻게 튕길지* — 운동량 보존으로 속도 갱신 | 당구공, 박스 던지기, 물리 퍼즐 |
+
+### 학습 추천 다음 알고리즘
+
+1. **SAT** — 2D 충돌의 정석. AABB 의 *분리 축 정리* 를 *회전된 박스* 로 일반화. 회전 OBB 의 충돌이 *분리 축 후보* 와 함께 시각화되면 직관이 단번에 잡힌다. AABB 데모 2번 (Overlap) 에서 미리 본 분리 축의 정식 형태.
+2. (선택) **Verlet Integration** — 충돌 검사가 아닌 *시뮬레이션* 측. 천/로프/소프트바디가 매 프레임 자연스럽게 흔들리는 데모는 비주얼 임팩트가 크다.
+3. (선택) **CCD (Sweep AABB)** — AABB 의 *이동 경로* 까지 고려. 빠른 객체가 벽을 *통과* 하는 tunneling 문제를 해결.
+
+> 공간 분할 + 충돌 narrow-phase + 시뮬레이션의 3 단계가 모이면 *완전한 자체 물리 엔진* 의 기본 골격. AABB 까지 마쳤으면 1/3 완성.
 
 ---
 
@@ -132,13 +165,18 @@ NPC 행동, 적 AI, 보드게임 봇.
 4. ~~**Behavior Tree**~~ — *완료* (`Assets/Algorithms/AI/BehaviorTree`). BT × A\* 협업 시각화.
 5. ~~**GOAP**~~ — *완료* (`Assets/Algorithms/AI/GOAP`). 상태 공간 A\* + Move 행동 안에서 격자 A\* 협업.
 6. ~~**Utility AI**~~ — *완료* (`Assets/Algorithms/AI/UtilityAI`). 점수 함수 + 매 tick 결정 + 환경 변화 즉각 반응.
-7. ~~**FSM**~~ — *완료* (`Assets/Algorithms/AI/FSM`). NPC 의사결정 4 종 (BT / GOAP / UAI / FSM) 비교 마무리. 명시적 상태 다이어그램 시각화.
-8. **Perlin Noise** — 절차적 생성 입문. 즉시 시각적 결과가 인상적.
-9. **Quadtree / Spatial Hashing** — 게임 성능 최적화의 핵심.
-10. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
-11. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
+7. ~~**FSM**~~ — *완료* (`Assets/Algorithms/AI/FSM`). NPC 의사결정 4 종 (BT / GOAP / UAI / FSM) 비교 마무리.
+8. ~~**Quadtree**~~ — *완료* (`Assets/Algorithms/Spatial/Quadtree`). 적응형 4 분할 + 2 페이즈 시각화 (삽입 애니메이션 + 마우스 쿼리).
+9. ~~**Spatial Hashing**~~ — *완료* (`Assets/Algorithms/Spatial/SpatialHashing`). 균등 격자 + broad↔narrow 2 단계 색상 시각화. Quadtree 의 *적응 vs 균등* 짝.
+10. ~~**AABB**~~ — *완료* (`Assets/Algorithms/Physics/AABB`). 충돌 *narrow-phase* 입문, 3 데모 (Contains / Overlap / Slab Raycast) 를 한 화면에 가로 배치. *분리 축* 과 *슬랩 교집합* 직관을 시각으로 박는다.
+11. **SAT** — AABB 의 *분리 축 정리* 를 회전된 박스로 일반화. AABB 데모 2번에서 본 \"분리 축\" 의 정식 형태. 2D 충돌의 사실상 표준.
+12. **Perlin Noise** — 절차적 생성 입문. 카테고리를 바꿔 시각적 임팩트 폭발 (지형 / 구름 / 동굴).
+13. **BVH** — Spatial 카테고리의 세 번째 축 (공간이 아닌 *객체* 를 트리). Quadtree / Spatial Hashing 과 한 씬에서 비교하면 *동적 객체 처리 차이* 가 드러남.
+14. **Cellular Automata** — 동굴 생성 데모. 비주얼 임팩트 큼.
+15. **A\* 변형 (JPS+ 또는 Theta\*)** — 이미 구현한 A\* 의 확장.
+16. **Verlet Integration** — 충돌이 아닌 *시뮬레이션* 측. 천/로프/소프트바디.
 
-가장 *게임답고 시각적인 데모* 가 나오는 건 **Perlin Noise** + **Cellular Automata** 조합. Unity 그리드 위에 즉시 인상적인 결과가 나와서 다음 학습으로 동기 부여가 잘 된다.
+가장 *게임답고 시각적인 데모* 가 나오는 건 **Perlin Noise** + **Cellular Automata** 조합. Unity 그리드 위에 즉시 인상적인 결과가 나와서 다음 학습으로 동기 부여가 잘 된다. **물리 / 충돌 카테고리 (10번)** 는 Spatial 카테고리 (broad-phase) 의 자연스러운 다음 단계 — broad → narrow → response 의 충돌 시스템 3 단계를 채워나가는 흐름.
 
 ---
 

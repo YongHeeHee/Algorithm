@@ -38,7 +38,7 @@
 
 ## 빠른 사용법
 
-1. `Assets/Scenes/0.TempScene.unity` 를 복사 → `Assets/Scenes/Physics/SpatialHashing.unity` 로 이름 변경
+1. `Assets/Scenes/0.TempScene.unity` 를 복사 → `Assets/Scenes/Spatial/SpatialHashing.unity` 로 이름 변경
 2. 빈 GameObject 생성 → 이름 `SpatialHashDemo` → `SpatialHashVisualizer` 컴포넌트 부착
 3. **카메라 셋업** — 위에서 내려다보는 각도 필수
    - Position `(0, 25, 0)` / Rotation `(90, 0, 0)`

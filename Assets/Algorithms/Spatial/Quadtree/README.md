@@ -40,7 +40,7 @@
 
 ## 빠른 사용법
 
-1. `Assets/Scenes/Physics/Quadtree.unity` 열기 (없으면 빈 씬 새로 생성 — 부모 폴더 `Physics/` 는 이미 존재)
+1. `Assets/Scenes/Spatial/Quadtree.unity` 열기
 2. 빈 GameObject 생성 → 이름 `QuadtreeDemo`
 3. `QuadtreeVisualizer` 컴포넌트 부착
 4. **카메라 셋업** — 위에서 내려다보는 각도 필수
