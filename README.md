@@ -20,7 +20,7 @@
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP / Utility AI / FSM / Quadtree / Spatial Hashing / AABB : 위에서 내려다보는 각도 — 그리드/보드가 평면
+   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP / Utility AI / FSM / Quadtree / Spatial Hashing / AABB / BVH : 위에서 내려다보는 각도 — 그리드/보드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -51,6 +51,7 @@
 | 12 | Quadtree (사분 트리, 2D 공간 분할) | Spatial | [`Spatial/Quadtree`](Assets/Algorithms/Spatial/Quadtree) | [Quadtree 노트](https://www.notion.so/3555e18a57368183a860d9e87c8b1b35) | `Assets/Scenes/Spatial/Quadtree.unity` |
 | 13 | Spatial Hashing (균등 격자 공간 인덱싱) | Spatial | [`Spatial/SpatialHashing`](Assets/Algorithms/Spatial/SpatialHashing) | [Spatial Hashing 노트](https://www.notion.so/3555e18a573681fe9b13cd4f6938fb5c) | `Assets/Scenes/Spatial/SpatialHashing.unity` |
 | 14 | AABB (충돌 검사의 원자 단위, 3 연산) | Physics | [`Physics/AABB`](Assets/Algorithms/Physics/AABB) | [AABB 노트](https://www.notion.so/3555e18a573681c9b988fcf703a37dbd) | `Assets/Scenes/Physics/AABB.unity` |
+| 15 | BVH (Bounding Volume Hierarchy, 객체 기반 공간 분할) | Spatial | [`Spatial/BVH`](Assets/Algorithms/Spatial/BVH) | [BVH 노트](https://www.notion.so/3555e18a57368180a42ec03735328a38) | `Assets/Scenes/Spatial/BVH.unity` |
 
 ## 알고리즘 비교
 
@@ -73,6 +74,7 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 | **Quadtree** (Spatial) | 재귀 트리 (`Quadtree<T>[4]` 자식, leaf 만 `List<Point>`) | 영역 *교차 검사* (`Bounds.Intersects(query)`) — 안 겹치면 자손 통째로 스킵 | 2D 점 집합 + 쿼리 영역 (AABB) | ❌ | ❌ (pruning 이 그 자리) ◇ |
 | **Spatial Hashing** (Spatial) | `Dictionary<(int,int), List<Point>>` — 균등 격자 | 셀 좌표 *해시* (`Floor(x/cellSize)`) — 덮은 셀만 순회 + Contains 정밀 검사 | 2D 점 집합 + 쿼리 영역 (AABB) | ❌ | ❌ (cellSize 가 유일 튜닝) ◆ |
 | **AABB** (Physics) | `readonly struct` (4 float) — 자료구조 없음, 연산이 자체 | Contains (4 비교) / Overlaps (분리 축) / Slab Raycast (슬랩 교집합) | 박스 + 점 / 다른 박스 / 광선 | ❌ | ❌ (수학 연산만) ▲ |
+| **BVH** (Spatial) | 재귀 트리 (binary, leaf 만 `List<int>` 객체 인덱스) — 노드 / 객체 박스 모두 `Algorithms.Physics.AABB` *재사용* | 광선 ↔ 노드 AABB *Slab Raycast* — 안 맞으면 서브트리 통째 스킵 | 객체 (AABB+데이터) 집합 + 광선 (origin + dir) | ❌ | ❌ (median split 이 그 자리 / SAH 가 응용) ▼ |
 
 † 평가 함수는 비-잎(non-terminal) 노드에서 탐색을 중단할 때 쓰는 휴리스틱이지만, 틱택토는 완전 탐색이 가능하므로 사용하지 않는다. 대신 **Alpha-Beta 가지치기** 로 노드 수를 O(b^d) → 최선 O(b^(d/2)) 로 줄인다.
 
@@ -91,6 +93,8 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 ◆ **Spatial Hashing 은 Quadtree 의 균등판** — 같은 카테고리 (공간 인덱싱) 지만 분할 전략이 다르다. Quadtree 는 *적응형* (점 많은 곳만 깊이 분할), Spatial Hashing 은 *균등형* (모든 셀 같은 크기). 자료구조도 트리 vs 해시맵으로 정반대. 결정적 차이는 **동적 객체** — Quadtree 는 매 프레임 재구축 비용이 크지만 Spatial Hashing 은 셀 좌표만 다시 계산하면 끝이라 슈팅 / 입자 / Boids / MMO AoI 의 사실상 표준. 가속은 *2 단계* (broad: 셀 추리기 → narrow: Contains) — 시각화의 주황(후보) ↔ 분홍(결과) 색상 차이가 곧 두 단계의 구분이다.
 
 ▲ **AABB 는 *자료구조가 아니라 연산*** — Spatial / Physics 어디서나 *원자 단위* 로 등장. Quadtree 의 `QuadtreeBounds`, Spatial Hashing 의 `SpatialHashBounds` 가 자료구조 *내부 부품* 으로 AABB 를 이미 쓰고 있지만, 이 페이지의 AABB 는 *연산이 주제* 다. 3 핵심 연산 — Contains (점이 박스 안인가, 4 비교) / Overlaps (분리 축 정리의 단순형) / Slab Raycast (광선 ↔ 박스, *각 슬랩 진입/이탈 구간의 교집합* 이 핵심) — 이 세 가지가 모든 충돌 시스템의 1 차 필터이자 narrow-phase (SAT, GJK) 의 디딤돌. 시각화는 한 화면 가로 배치된 3 데모로 마우스 한 번에 세 결과를 동시에 보여준다.
+
+▼ **BVH 는 *공간이 아니라 객체를 분할*** — Quadtree (공간 4 등분) / Spatial Hashing (균등 격자) 와 같은 Spatial 카테고리지만 분할 전략이 정반대. 객체를 가까운 둘로 묶으므로 *형제 AABB 가 겹쳐도 됨* (= 버그가 아니라 정의). 비균일 분포 / 다양한 크기 객체에 강해 **레이트레이싱 (NVIDIA RTX / Unity DXR) / 물리 broad-phase (Dynamic AABBTree — Box2D / Bullet / PhysX) 의 사실상 표준**. AABB 와의 관계는 **AABB (원자) → BVH (분자)** — `QuadtreeBounds` / `SpatialHashBounds` 같은 자체 struct 를 만들지 *않고* `Algorithms.Physics.AABB` 를 *직접* import 해 노드 박스 / 광선 검사 (`AABB.Raycast`, Slab method) 모두 그대로 재사용. AI 카테고리가 `Search/A*` 를 부품으로 호출하는 협업 패턴과 같은 결. 시각화는 2 페이즈 (Phase 1 BFS Build 애니메이션 + Phase 2 마우스 광선) — 광선이 1 차원 직선이라 *대부분의 서브트리가 회색* 으로 가지치기되어 가속 효과가 가장 극적으로 보인다.
 
 각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다. NPC 의사결정 4 종 (BT / GOAP / Utility AI / FSM) 은 격자 + Capsule NPC + A\* 협업이라는 같은 골격을 공유하므로, 네 씬을 번갈아 켜보면 *결정 메커니즘만* 어떻게 달라지는지 한눈에 들어온다.
 
@@ -133,9 +137,14 @@ Assets/
 │   │   │   ├── QuadtreeAlgorithm.cs         #     QuadtreeBounds + QuadtreePoint + Quadtree<T> + BruteForceQuery
 │   │   │   ├── QuadtreeVisualizer.cs        #     2 페이즈 (삽입 애니메이션 + 마우스 쿼리) + LineRenderer 사각형 + OnGUI 카운터
 │   │   │   └── README.md
-│   │   └── SpatialHashing/                  #   균등 격자 + Dictionary 기반 인덱싱 — 동적 객체에 강함
-│   │       ├── SpatialHashAlgorithm.cs      #     SpatialHashBounds + SpatialHashPoint + SpatialHash<T> + BruteForceQuery
-│   │       ├── SpatialHashVisualizer.cs     #     2 페이즈 (격자 + 점 삽입 / 마우스 쿼리) + 점 색상 3종 (idle/candidate/result)
+│   │   ├── SpatialHashing/                  #   균등 격자 + Dictionary 기반 인덱싱 — 동적 객체에 강함
+│   │   │   ├── SpatialHashAlgorithm.cs      #     SpatialHashBounds + SpatialHashPoint + SpatialHash<T> + BruteForceQuery
+│   │   │   ├── SpatialHashVisualizer.cs     #     2 페이즈 (격자 + 점 삽입 / 마우스 쿼리) + 점 색상 3종 (idle/candidate/result)
+│   │   │   └── README.md
+│   │   └── BVH/                             #   객체 기반 binary 트리 — 레이트레이싱 / 물리 broad-phase 표준
+│   │       ├── BVHAlgorithm.cs              #     BVHObject + BVHNode + BVH<T> (top-down longest-axis median split + Raycast) + BruteForceRaycast
+│   │       │                                #     ※ Algorithms.Physics.AABB *재사용* — 노드/객체 박스 + Slab Raycast
+│   │       ├── BVHVisualizer.cs             #     2 페이즈 (BFS Build 애니메이션 / 마우스 광선) + LineRenderer 외곽선 + OnGUI 카운터
 │   │       └── README.md
 │   ├── Physics/                             # 물리 / 충돌 카테고리 (narrow-phase + 시뮬)
 │   │   └── AABB/                            #   축에 평행한 경계 박스 — 충돌 검사의 원자 단위
