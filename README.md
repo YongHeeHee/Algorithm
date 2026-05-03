@@ -20,7 +20,7 @@
 3. 씬 안에 Visualizer 가 붙은 GameObject 가 없으면:
    - 빈 GameObject 생성 → 원하는 알고리즘의 Visualizer 컴포넌트 부착
 4. 카메라 배치 권장:
-   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP / Utility AI / FSM : 위에서 내려다보는 각도 — 그리드/보드가 평면
+   - BFS / DFS / Flood Fill / Minimax / MCTS / Behavior Tree / GOAP / Utility AI / FSM / Quadtree / Spatial Hashing : 위에서 내려다보는 각도 — 그리드/보드가 평면
    - Dijkstra / A\* : 비스듬한 내려각 — 셀 높이 (= 가중치) 가 잘 보이도록
 5. (선택) Restart 버튼 셋업: Canvas + Button + `AlgorithmDemoUI` 컴포넌트 (`Assets/Algorithms/Common/`)
 6. Play → 색상 변화로 탐색 진행 관찰
@@ -48,6 +48,8 @@
 | 09 | GOAP (목표 기반 자동 계획) | AI | [`AI/GOAP`](Assets/Algorithms/AI/GOAP) | [GOAP 노트](https://www.notion.so/3515e18a57368129a014df84f372de2e) | `Assets/Scenes/GOAP.unity` |
 | 10 | Utility AI (점수 함수 의사결정) | AI | [`AI/UtilityAI`](Assets/Algorithms/AI/UtilityAI) | [Utility AI 노트](https://www.notion.so/3545e18a573681679f4bc7f67cdec3a1) | `Assets/Scenes/UtilityAI.unity` |
 | 11 | FSM (유한 상태 기계) | AI | [`AI/FSM`](Assets/Algorithms/AI/FSM) | [FSM 노트](https://www.notion.so/3545e18a57368122a69de02130727cf1) | `Assets/Scenes/FSM.unity` |
+| 12 | Quadtree (사분 트리, 2D 공간 분할) | Spatial | [`Spatial/Quadtree`](Assets/Algorithms/Spatial/Quadtree) | [Quadtree 노트](https://www.notion.so/3555e18a57368183a860d9e87c8b1b35) | `Assets/Scenes/Physics/Quadtree.unity` |
+| 13 | Spatial Hashing (균등 격자 공간 인덱싱) | Spatial | [`Spatial/SpatialHashing`](Assets/Algorithms/Spatial/SpatialHashing) | [Spatial Hashing 노트](https://www.notion.so/3555e18a573681fe9b13cd4f6938fb5c) | `Assets/Scenes/Physics/SpatialHashing.unity` |
 
 ## 알고리즘 비교
 
@@ -67,6 +69,8 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 | **GOAP** (AI) | `MinPriorityQueue<WorldState>` + `HashSet<WorldState>` | `f(s) = g(s) + h(s)` — A\* over **state space** | 행동 카탈로그 (Pre/Eff/Cost) | ✅ (행동 비용) | ✅ (미충족 사실 수) ¶ |
 | **Utility AI** (AI) | 행동 카탈로그 (`UtilityAction[]`) | 매 tick *점수 비교* (Considerations 곱 × Weight) | 행동 + Consideration + Response Curve | ❌ (Weight 로 행동 우선순위) | ❌ (Response Curve 가 점수 곡선) ※ |
 | **FSM** (AI) | 상태 + 전이 리스트 (`List<FSMState>` + `List<FSMTransition>`) | 현재 상태에서 *나가는 전이* 검사 (first match wins) | 상태 그래프 (디자이너 직접 작성) | ❌ | ❌ (전이 등록 순서가 우선순위) ★ |
+| **Quadtree** (Spatial) | 재귀 트리 (`Quadtree<T>[4]` 자식, leaf 만 `List<Point>`) | 영역 *교차 검사* (`Bounds.Intersects(query)`) — 안 겹치면 자손 통째로 스킵 | 2D 점 집합 + 쿼리 영역 (AABB) | ❌ | ❌ (pruning 이 그 자리) ◇ |
+| **Spatial Hashing** (Spatial) | `Dictionary<(int,int), List<Point>>` — 균등 격자 | 셀 좌표 *해시* (`Floor(x/cellSize)`) — 덮은 셀만 순회 + Contains 정밀 검사 | 2D 점 집합 + 쿼리 영역 (AABB) | ❌ | ❌ (cellSize 가 유일 튜닝) ◆ |
 
 † 평가 함수는 비-잎(non-terminal) 노드에서 탐색을 중단할 때 쓰는 휴리스틱이지만, 틱택토는 완전 탐색이 가능하므로 사용하지 않는다. 대신 **Alpha-Beta 가지치기** 로 노드 수를 O(b^d) → 최선 O(b^(d/2)) 로 줄인다.
 
@@ -79,6 +83,10 @@ Minimax 는 다른 카테고리(AI / 게임 트리) 지만 본질은 *DFS 의 �
 ※ **Utility AI 는 *탐색* 이 아니다** — 사슬을 *계획* 하지 않고 *매 tick* 모든 행동의 점수를 그 자리에서 비교한다. GOAP 처럼 멀리 보지는 못하지만, 환경 변화에 *즉시 반응* 하는 게 강점 (적이 가까워지면 식사 중에도 도망). 행동 *내부* 의 이동은 BT/GOAP 와 같은 협업 패턴으로 격자 A\* 호출.
 
 ★ **FSM 은 명시성의 극단** — 디자이너가 모든 상태 / 전이 / 조건을 *직접* 그려둔다. AI 는 매 tick 현재 상태의 outgoing 전이만 검사 → 거의 공짜에 가까운 비용. 단, 상태가 많아지면 전이가 제곱으로 폭발 ("FSM 폭발 문제"). 모던 게임은 *애니메이션은 FSM (Unity Animator), 의사결정은 BT/UAI/GOAP* 로 책임을 분리.
+
+◇ **Quadtree 는 *탐색이 아니다*** — 경로를 찾거나 노드를 순회하는 게 아니라, 2D 공간을 *재귀적으로 인덱싱* 해 "이 영역 안의 점들" 같은 *공간 쿼리* 를 가속한다. BFS 의 `visited` 집합 같은 게 없는 것은 트리에 사이클이 없기 때문 (그래프가 아니라 트리). 가족 관계로 보면 BST 의 2D 일반화 — BST 가 *값* 을 반으로 가르듯 Quadtree 는 *공간* 을 4 등분으로 가른다. 3D 로 가면 자식 4 → 8 = Octree.
+
+◆ **Spatial Hashing 은 Quadtree 의 균등판** — 같은 카테고리 (공간 인덱싱) 지만 분할 전략이 다르다. Quadtree 는 *적응형* (점 많은 곳만 깊이 분할), Spatial Hashing 은 *균등형* (모든 셀 같은 크기). 자료구조도 트리 vs 해시맵으로 정반대. 결정적 차이는 **동적 객체** — Quadtree 는 매 프레임 재구축 비용이 크지만 Spatial Hashing 은 셀 좌표만 다시 계산하면 끝이라 슈팅 / 입자 / Boids / MMO AoI 의 사실상 표준. 가속은 *2 단계* (broad: 셀 추리기 → narrow: Contains) — 시각화의 주황(후보) ↔ 분홍(결과) 색상 차이가 곧 두 단계의 구분이다.
 
 각 Visualizer 의 `randomSeed` 를 동일하게 맞추면 같은 좌표계에서 다섯 탐색 알고리즘의 패턴 차이가 시각적으로 드러난다 (BFS 동심원 vs DFS 뱀 vs Dijkstra 비용 등고선 vs A\* 화살표 vs Flood Fill 색 영역 채움). Minimax 는 좌표가 아닌 게임 국면 위에서 동작하므로 별도 데모 (틱택토) 로 따로 비교한다. NPC 의사결정 4 종 (BT / GOAP / Utility AI / FSM) 은 격자 + Capsule NPC + A\* 협업이라는 같은 골격을 공유하므로, 네 씬을 번갈아 켜보면 *결정 메커니즘만* 어떻게 달라지는지 한눈에 들어온다.
 
@@ -115,6 +123,15 @@ Assets/
 │   │   └── FSM/                             #   유한 상태 기계 — 클래식 NPC / Animator 의 표준 패턴
 │   │       ├── FSMAlgorithm.cs              #     FSMState + FSMTransition + FSMachine (first-match-wins)
 │   │       ├── FSMGridVisualizer.cs         #     5상태 + 7전이 + 시야 셀 + Player(WASD) + 상태 다이어그램
+│   │       └── README.md
+│   ├── Spatial/                             # 공간 분할 카테고리
+│   │   ├── Quadtree/                        #   2D 공간 4 분할 인덱싱 — 충돌 / 근접 검색 가속
+│   │   │   ├── QuadtreeAlgorithm.cs         #     QuadtreeBounds + QuadtreePoint + Quadtree<T> + BruteForceQuery
+│   │   │   ├── QuadtreeVisualizer.cs        #     2 페이즈 (삽입 애니메이션 + 마우스 쿼리) + LineRenderer 사각형 + OnGUI 카운터
+│   │   │   └── README.md
+│   │   └── SpatialHashing/                  #   균등 격자 + Dictionary 기반 인덱싱 — 동적 객체에 강함
+│   │       ├── SpatialHashAlgorithm.cs      #     SpatialHashBounds + SpatialHashPoint + SpatialHash<T> + BruteForceQuery
+│   │       ├── SpatialHashVisualizer.cs     #     2 페이즈 (격자 + 점 삽입 / 마우스 쿼리) + 점 색상 3종 (idle/candidate/result)
 │   │       └── README.md
 │   └── Search/                              # 탐색 카테고리
 │       ├── Graph.cs                         #   비가중 인접 리스트 (BFS / DFS)
